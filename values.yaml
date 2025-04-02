@@ -1,0 +1,25 @@
+controller:
+  replicaCount: {{ .Values.replica_count | default 1 }}
+  service:
+    loadBalancerIP: {{ .Values.ip_address | default "" }}
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/healthz"
+  nodeSelector:
+    kubernetes.io/os: "linux"
+  admissionWebhooks:
+    patch:
+      nodeSelector:
+        kubernetes.io/os: "linux"
+  ingressClass: {{ .Values.ingress_class | default "nginx" }}
+  ingressClassResource:
+    default: {{ .Values.is_default | default false }}
+  watchIngressWithoutClass: {{ .Values.watch_ingress_without_class | default false }}
+  settings:
+    {{- range $key, $value := .Values.settings }}
+    {{$key}}: {{$value}}
+    {{- end }}
+
+defaultBackend:
+  nodeSelector:
+    kubernetes.io/os: "linux"
